@@ -1,278 +1,93 @@
-.root {
-  padding: 20px;
-  margin: 0 auto;
-  max-width: 1400px;
-  min-height: 100vh;
-  width: 100%;
-}
-
-.filtersContainer {
-  width: 100%;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  margin-bottom: 30px;
-}
-
-.filtersTitle {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #2c3e50;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.filtersContent {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 30px;
-  align-items: start;
-}
-
-.filterSection {
-  h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #495057;
-    margin-bottom: 12px;
-    margin-top: 0;
-  }
-}
-
-.filterOptions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.categoriesLoading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #6c757d;
-  font-size: 0.85rem;
-}
-
-.filterButton {
-  padding: 6px 12px;
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  color: #495057;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #007bff;
-    color: #fff;
-    border-color: #007bff;
-  }
-}
-
-.priceInputs {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  span {
-    color: #6c757d;
-    font-weight: 500;
-  }
-}
-
-.priceInput, .locationInput {
-  padding: 8px 12px;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  width: 100%;
-  max-width: 120px;
-
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-  }
-}
-
-.locationInput {
-  max-width: none;
-}
-
 .container {
-  width: 100%;
+  padding: 2rem 0;
 }
 
-.mainContent {
-  width: 100%;
-}
-
-// 4-column grid layout
-.adsGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  width: 100%;
-}
-
-.adItem {
-  width: 100%;
-}
-
-.errorContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-  padding: 40px;
-  background: #fff;
-  border: 1px solid #dc3545;
-  border-radius: 8px;
-  margin: 0 auto;
-  max-width: 500px;
-  width: 100%;
-}
-
-.errorText {
+.title {
+  margin-bottom: 2rem;
   text-align: center;
-  font-weight: 500;
-  color: #dc3545;
-  font-size: 1.1rem;
 }
 
-.emptyContainer {
+.filtersCard {
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.categorySelect {
+  min-width: 200px !important;
+}
+
+.adCard {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-  padding: 40px;
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  margin: 0 auto;
-  max-width: 500px;
-  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
 }
 
-.searchIcon {
-  font-size: 48px;
-  color: #6c757d;
-  margin-bottom: 15px;
+.cardMedia {
+  height: 200px;
+  object-fit: cover;
 }
 
-.emptyText {
-  text-align: center;
-  font-weight: 500;
-  color: #6c757d;
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+.cardContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.emptySubtext {
-  text-align: center;
-  color: #adb5bd;
-  font-size: 0.9rem;
+.cardTitle {
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.skeletonGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  width: 100%;
+.cardPrice {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
-.skeletonItem {
-  width: 100%;
+.cardDescription {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
-.loadingOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
+.cardFooter {
+  margin-top: 1rem;
+}
+
+.chipContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.loadingContainer {
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  padding: 2rem 0;
 }
 
-.loadingSpinner {
-  color: #007bff;
+.errorAlert {
+  margin-bottom: 2rem;
 }
 
-@media (max-width: 1200px) {
-  .adsGrid, .skeletonGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .filtersContent {
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
-  }
+.resultsInfo {
+  margin-bottom: 1rem;
 }
 
-@media (max-width: 992px) {
-  .adsGrid, .skeletonGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .filtersContent {
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .root {
-    padding: 15px;
-  }
-  
-  .filtersContainer {
-    padding: 15px;
-    margin-bottom: 20px;
-  }
-  
-  .filtersContent {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .adsGrid, .skeletonGrid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .filterOptions {
-    justify-content: center;
-  }
-  
-  .priceInputs {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .root {
-    padding: 10px;
-  }
-  
-  .filtersContainer {
-    padding: 12px;
-  }
-  
-  .filtersTitle {
-    font-size: 1.1rem;
-  }
-  
-  .filterButton {
-    font-size: 0.8rem;
-    padding: 5px 10px;
-  }
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
 }

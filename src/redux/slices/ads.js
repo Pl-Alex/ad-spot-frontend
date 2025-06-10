@@ -15,6 +15,15 @@ export const fetchAd = createAsyncThunk("ads/fetchAd", async (id) => {
   return data;
 });
 
+export const fetchMyAds = createAsyncThunk(
+  "ads/fetchMyAds",
+  async (params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    const { data } = await axios.get(`/ads/user/my?${queryParams}`);
+    return data;
+  }
+);
+
 export const createAd = createAsyncThunk("ads/createAd", async (adData) => {
   const { data } = await axios.post("/ads", adData);
   return data;
@@ -23,7 +32,27 @@ export const createAd = createAsyncThunk("ads/createAd", async (adData) => {
 export const updateAd = createAsyncThunk(
   "ads/updateAd",
   async ({ id, ...adData }) => {
-    const { data } = await axios.put(`/ads/${id}`, adData);
+    const { data } = await axios.patch(`/ads/${id}`, adData);
+    return data;
+  }
+);
+
+export const toggleAd = createAsyncThunk("ads/toggleAd", async (id) => {
+  const { data } = await axios.patch(`/ads/${id}/toggle`);
+  return { id, ...data };
+});
+
+export const uploadPhotos = createAsyncThunk(
+  "ads/uploadPhotos",
+  async (files) => {
+    const formData = new FormData();
+    files.forEach((file) => formData.append("photos", file));
+
+    const { data } = await axios.post("/upload/photos", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return data;
   }
 );
@@ -54,53 +83,131 @@ const initialState = {
       total: 0,
     },
   },
+  myAds: {
+    items: [],
+    status: "loading",
+    pagination: {
+      current: 1,
+      pages: 1,
+      total: 0,
+    },
+  },
+  currentAd: {
+    data: null,
+    status: "loading",
+  },
   categories: {
     items: [],
     status: "loading",
   },
+  uploadStatus: "idle",
 };
 
 const adsSlice = createSlice({
   name: "ads",
   initialState,
-  reducers: {},
+  reducers: {
+    clearCurrentAd: (state) => {
+      state.currentAd.data = null;
+      state.currentAd.status = "loading";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAds.pending, (state) => {
         state.ads.status = "loading";
-        state.ads.items = [];
       })
       .addCase(fetchAds.fulfilled, (state, action) => {
         state.ads.status = "loaded";
         state.ads.items = action.payload.ads;
         state.ads.pagination = action.payload.pagination;
       })
-      .addCase(fetchAds.rejected, (state, action) => {
+      .addCase(fetchAds.rejected, (state) => {
         state.ads.status = "error";
         state.ads.items = [];
       })
 
+      .addCase(fetchAd.pending, (state) => {
+        state.currentAd.status = "loading";
+      })
       .addCase(fetchAd.fulfilled, (state, action) => {
-        state.ads.items = action.payload;
+        state.currentAd.status = "loaded";
+        state.currentAd.data = action.payload;
+      })
+      .addCase(fetchAd.rejected, (state) => {
+        state.currentAd.status = "error";
+        state.currentAd.data = null;
       })
 
+      .addCase(fetchMyAds.pending, (state) => {
+        state.myAds.status = "loading";
+      })
+      .addCase(fetchMyAds.fulfilled, (state, action) => {
+        state.myAds.status = "loaded";
+        state.myAds.items = action.payload.ads;
+        state.myAds.pagination = action.payload.pagination;
+      })
+      .addCase(fetchMyAds.rejected, (state) => {
+        state.myAds.status = "error";
+        state.myAds.items = [];
+      })
       .addCase(createAd.fulfilled, (state, action) => {
         state.ads.items.unshift(action.payload);
+        state.myAds.items.unshift(action.payload);
       })
 
       .addCase(updateAd.fulfilled, (state, action) => {
-        const index = state.ads.items.ads.findIndex(
+        const adsIndex = state.ads.items.findIndex(
           (ad) => ad._id === action.payload._id
         );
-        if (index !== -1) {
-          state.ads.items[index] = action.payload;
+        if (adsIndex !== -1) {
+          state.ads.items[adsIndex] = action.payload;
+        }
+
+        const myAdsIndex = state.myAds.items.findIndex(
+          (ad) => ad._id === action.payload._id
+        );
+        if (myAdsIndex !== -1) {
+          state.myAds.items[myAdsIndex] = action.payload;
+        }
+
+        if (state.currentAd.data?._id === action.payload._id) {
+          state.currentAd.data = action.payload;
+        }
+      })
+
+      .addCase(toggleAd.fulfilled, (state, action) => {
+        const { id, active } = action.payload;
+
+        const adsIndex = state.ads.items.findIndex((ad) => ad._id === id);
+        if (adsIndex !== -1) {
+          state.ads.items[adsIndex].active = active;
+        }
+
+        const myAdsIndex = state.myAds.items.findIndex((ad) => ad._id === id);
+        if (myAdsIndex !== -1) {
+          state.myAds.items[myAdsIndex].active = active;
+        }
+
+        if (state.currentAd.data?._id === id) {
+          state.currentAd.data.active = active;
         }
       })
 
       .addCase(fetchRemoveAd.pending, (state, action) => {
-        state.ads.items = state.ads.items.filter(
-          (ad) => ad._id !== action.meta.arg
-        );
+        const adId = action.meta.arg;
+        state.ads.items = state.ads.items.filter((ad) => ad._id !== adId);
+        state.myAds.items = state.myAds.items.filter((ad) => ad._id !== adId);
+      })
+
+      .addCase(uploadPhotos.pending, (state) => {
+        state.uploadStatus = "loading";
+      })
+      .addCase(uploadPhotos.fulfilled, (state) => {
+        state.uploadStatus = "loaded";
+      })
+      .addCase(uploadPhotos.rejected, (state) => {
+        state.uploadStatus = "error";
       })
 
       .addCase(fetchCategories.pending, (state) => {
@@ -111,7 +218,7 @@ const adsSlice = createSlice({
         state.categories.status = "loaded";
         state.categories.items = action.payload;
       })
-      .addCase(fetchCategories.rejected, (state, action) => {
+      .addCase(fetchCategories.rejected, (state) => {
         state.categories.status = "error";
         state.categories.items = [];
       });
