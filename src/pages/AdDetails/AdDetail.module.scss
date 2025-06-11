@@ -1,37 +1,41 @@
-.root {
-  background-color: #fff;
-  padding: 10px 0;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 30px;
+.container {
+  padding: 2rem 0;
+  min-height: 70vh;
 }
 
-.inner {
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.errorAlert {
+  margin-bottom: 2rem;
+}
+
+.header {
   display: flex;
   justify-content: space-between;
-}
+  align-items: center;
+  margin-bottom: 2rem;
 
-.logo {
-  background-color: black;
-  color: #fff;
-  font-weight: 700;
-  line-height: 35px;
-  text-transform: uppercase;
-  letter-spacing: 0.15px;
-  border-radius: 5px;
-  padding: 0 10px;
-  text-decoration: none;
+  .backButton {
+    flex-shrink: 0;
+  }
 
-  &:hover {
-    background-color: #4361ee;
+  .ownerActions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
   }
 }
 
-.buttons {
-  button {
-    margin-left: 10px;
-  }
-
-  a {
-    text-decoration: none;
+.descriptionCard {
+  .description {
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 }

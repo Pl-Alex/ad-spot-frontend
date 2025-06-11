@@ -1,0 +1,96 @@
+.adGridItem {
+  flex: 1 1 calc(33.333% - 1rem);
+  min-width: 300px;
+  max-width: calc(33.333% - 1rem);
+  
+  @media (max-width: 900px) {
+    flex: 1 1 calc(50% - 0.75rem);
+    max-width: calc(50% - 0.75rem);
+    min-width: 280px;
+  }
+  
+  @media (max-width: 600px) {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: unset;
+  }
+}
+
+.adCard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-height: 400px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.cardMedia {
+  height: 200px;
+  width: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.cardContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.cardTitle {
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  min-height: 1.5rem;
+}
+
+.cardPrice {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #1976d2;
+  min-height: 1.75rem;
+}
+
+.cardDescription {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  margin-bottom: 1rem;
+  min-height: 3.6rem;
+  line-height: 1.2;
+}
+
+.cardFooter {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.chipContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  min-height: 2rem;
+  align-items: flex-start;
+}
+
+.userInfo {
+  margin-top: 0.5rem;
+  min-height: 1rem;
+}

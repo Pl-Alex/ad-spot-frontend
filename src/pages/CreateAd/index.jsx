@@ -1,98 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import FormHelperText from '@mui/material/FormHelperText';
-import Box from '@mui/material/Box';
-
-import styles from './CreateAd.module.scss';
+import { Navigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Typography, Paper, Button } from '@mui/material';
 import { selectIsAuth } from '../../redux/slices/auth';
-import { createAd, fetchCategories, uploadPhotos } from '../../redux/slices/ads';
+import { fetchCategories } from '../../redux/slices/ads';
+import { TextFormField, SelectFormField, PhotoUpload } from '../../components';
+import { useAdForm } from '../../hooks/useAdForm';
+import { createAdValidationRules, createAdDefaultValues } from '../../utils/validationRules';
+import styles from './CreateAd.module.scss';
 
 export const CreateAd = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const isAuth = useSelector(selectIsAuth);
-  const { categories } = useSelector((state) => state.ads);
-  const [selectedFiles, setSelectedFiles] = React.useState([]);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    control,
-  } = useForm({
-    defaultValues: {
-      title: '',
-      description: '',
-      price: '',
-      location: '',
-      category: '',
-    },
+  const { categories } = useSelector(state => state.ads);
+  const { selectedFiles, isSubmitting, handleFileChange, submitAd } = useAdForm();
+  
+  const { register, handleSubmit, formState: { errors, isValid }, control } = useForm({
+    createAdDefaultValues,
     mode: 'onChange',
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
 
-  const onSubmit = async (values) => {
-    if (!isAuth) return;
+  if (!isAuth) return <Navigate to="/login" />;
 
-    setIsSubmitting(true);
-    
-    try {
-      let imageUrls = [];
-      
-      if (selectedFiles.length > 0) {
-        const uploadResult = await dispatch(uploadPhotos(selectedFiles));
-        console.log('Upload result:', uploadResult);
-        if (uploadResult.payload) {
-            const fullUrls = uploadResult.payload.photos || [];
-            imageUrls = fullUrls.map(url => {
-                return url.replace('/uploads/ads/', '');
-            });
-        }
-      }
-
-      const adData = {
-        ...values,
-        price: parseFloat(values.price),
-        photos: imageUrls,
-      };
-
-      const result = await dispatch(createAd(adData));
-      
-      if (result.payload) {
-        navigate(`/ads/${result.payload._id}`);
-      } else {
-        alert('Nie udało się utworzyć ogłoszenia!');
-      }
-    } catch (error) {
-      console.error('Error creating ad:', error);
-      alert('Wystąpił błąd podczas tworzenia ogłoszenia!');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleFileChange = (event) => {
-    const files = Array.from(event.target.files);
-    setSelectedFiles(files);
-  };
-
-  if (!isAuth) {
-    return <Navigate to="/login" />;
-  }
+  const categoryOptions = categories.items?.map(category => ({
+    value: category._id,
+    label: category.name
+  })) || [];
 
   return (
     <Paper classes={{ root: styles.root }}>
@@ -100,105 +38,55 @@ export const CreateAd = () => {
         Dodaj nowe ogłoszenie
       </Typography>
       
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextField
-          className={styles.field}
+      <form onSubmit={handleSubmit(submitAd)}>
+        <TextFormField
+          register={register}
+          error={errors.title}
+          name="title"
           label="Tytuł ogłoszenia"
-          error={Boolean(errors.title?.message)}
-          helperText={errors.title?.message}
-          {...register('title', { 
-            required: 'Podaj tytuł ogłoszenia',
-            minLength: {
-              value: 5,
-              message: 'Tytuł musi mieć co najmniej 5 znaków'
-            }
-          })}
-          fullWidth
+          validation={createAdValidationRules.title}
         />
 
-        <TextField
-          className={styles.field}
+        <TextFormField
+          register={register}
+          error={errors.description}
+          name="description"
           label="Opis"
           multiline
           rows={4}
-          error={Boolean(errors.description?.message)}
-          helperText={errors.description?.message}
-          {...register('description', { 
-            required: 'Podaj opis ogłoszenia',
-            minLength: {
-              value: 20,
-              message: 'Opis musi mieć co najmniej 20 znaków'
-            }
-          })}
-          fullWidth
+          validation={createAdValidationRules.description}
         />
 
-        <TextField
-          className={styles.field}
+        <TextFormField
+          register={register}
+          error={errors.price}
+          name="price"
           label="Cena (PLN)"
           type="number"
-          error={Boolean(errors.price?.message)}
-          helperText={errors.price?.message}
-          {...register('price', { 
-            required: 'Podaj cenę',
-            min: {
-              value: 0,
-              message: 'Cena nie może być ujemna'
-            }
-          })}
-          fullWidth
+          validation={createAdValidationRules.price}
         />
 
-        <TextField
-          className={styles.field}
+        <TextFormField
+          register={register}
+          error={errors.location}
+          name="location"
           label="Lokalizacja"
-          error={Boolean(errors.location?.message)}
-          helperText={errors.location?.message}
-          {...register('location', { required: 'Podaj lokalizację' })}
-          fullWidth
+          validation={createAdValidationRules.location}
         />
 
-        <Controller
-          name="category"
+        <SelectFormField
           control={control}
-          rules={{ required: 'Wybierz kategorię' }}
-          render={({ field }) => (
-            <FormControl className={styles.field} fullWidth error={Boolean(errors.category)}>
-              <InputLabel>Kategoria</InputLabel>
-              <Select
-                {...field}
-                label="Kategoria"
-              >
-                {categories.items.map((category) => (
-                  <MenuItem key={category._id} value={category._id}>
-                    {category.name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.category && (
-                <FormHelperText>{errors.category.message}</FormHelperText>
-              )}
-            </FormControl>
-          )}
+          error={errors.category}
+          name="category"
+          label="Kategoria"
+          options={categoryOptions}
+          validation={createAdValidationRules.category}
         />
 
-        <Box className={styles.uploadSection}>
-          <Typography variant="body2" className={styles.uploadLabel}>
-            Zdjęcia (opcjonalne)
-          </Typography>
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            onChange={handleFileChange}
-            className={styles.fileInput}
-          />
-          {selectedFiles.length > 0 && (
-            <Typography variant="body2" className={styles.fileCount}>
-              Wybrano plików: {selectedFiles.length}
-            </Typography>
-          )}
-        </Box>
+        <PhotoUpload
+          selectedFiles={selectedFiles}
+          onFileChange={handleFileChange}
+        />
 
         <Button 
           disabled={!isValid || isSubmitting} 

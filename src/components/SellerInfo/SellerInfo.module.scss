@@ -1,0 +1,22 @@
+.sellerCard {
+  margin-top: 24px;
+}
+
+.sellerInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sellerAvatar {
+  width: 56px;
+  height: 56px;
+  background: #1976d2;
+}
+
+.contactButton {
+  margin-top: 16px;
+  padding: 12px 0;
+  font-weight: 600;
+}

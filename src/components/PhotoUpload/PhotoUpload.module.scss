@@ -1,0 +1,33 @@
+.uploadSection {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
+  background-color: #fafafa;
+}
+
+.uploadLabel {
+  margin-bottom: 10px !important;
+  font-weight: 500 !important;
+  color: #666 !important;
+}
+
+.fileInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: #1976d2;
+  }
+}
+
+.fileCount {
+  margin-top: 8px !important;
+  color: #1976d2 !important;
+  font-weight: 500 !important;
+}

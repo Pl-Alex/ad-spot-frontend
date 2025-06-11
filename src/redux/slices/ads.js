@@ -226,3 +226,5 @@ const adsSlice = createSlice({
 });
 
 export const adsReducer = adsSlice.reducer;
+
+export const { clearCurrentAd } = adsSlice.actions;
