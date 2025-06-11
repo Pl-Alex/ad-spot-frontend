@@ -2,16 +2,33 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, Chip } from '@mui/material';
 import styles from './AdCard.module.scss';
 
-export const AdCard = ({ ad, onCardClick }) => {
+const StatusChip = ({ active }) => (
+  <Chip
+    label={active ? 'Aktywne' : 'Nieaktywne'}
+    color={active ? 'success' : 'default'}
+    size="small"
+    sx={{
+      position: 'absolute',
+      top: 8,
+      right: 8,
+      fontSize: '0.75rem',
+      zIndex: 1
+    }}
+  />
+);
+
+export const AdCard = ({ ad, onCardClick, showStatus = false }) => {
   const formatPrice = price =>
     new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(price);
 
   const getImageUrl = photoPath =>
     photoPath ? `${process.env.REACT_APP_API_URL}uploads/ads/${photoPath}` : '/placeholder-image.jpg';
 
+  
   return (
     <div className={styles.adGridItem}>
       <Card className={styles.adCard} onClick={() => onCardClick(ad._id)}>
+        {showStatus && <StatusChip active={ad.active} />}
         <CardMedia
           component="img"
           image={getImageUrl(ad.photos?.[0])}

@@ -11,6 +11,7 @@ import {
   CreateAd,
   AdDetails,
   Profile,
+  AdEdit,
 } from "./pages";
 import { Navbar } from "./components";
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="/register" element={<Registration />} />
           <Route path="/create" element={<CreateAd />} />
           <Route path="/ads/:id" element={<AdDetails />} />
+          <Route path="/ads/:id/edit" element={<AdEdit />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </Container>
