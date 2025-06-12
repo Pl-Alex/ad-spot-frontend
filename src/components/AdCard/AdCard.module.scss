@@ -23,7 +23,7 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   min-height: 400px;
-
+  position: relative;
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);

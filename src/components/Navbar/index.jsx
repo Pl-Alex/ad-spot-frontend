@@ -31,6 +31,9 @@ export const Navbar = () => {
                 <Link to="create">
                   <Button variant="contained">New Ad</Button>
                 </Link>
+                <Link to="/profile">
+                  <Button variant="outlined">Profile</Button>
+                </Link>
                 <Button onClick={onClickLogout} variant="contained" color="error">
                   Logout
                 </Button>

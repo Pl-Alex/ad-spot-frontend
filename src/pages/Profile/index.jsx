@@ -17,7 +17,7 @@ import { Add, Person } from '@mui/icons-material';
 
 import { selectIsAuth } from '../../redux/slices/auth';
 import { fetchMyAds } from '../../redux/slices/ads';
-import { AdCard, LoadingState, ErrorState, NoResultsState } from '../../components';
+import { AdCard, LoadingState, ErrorState } from '../../components';
 import styles from './Profile.module.scss';
 
 const TabPanel = ({ children, value, index, ...other }) => (
@@ -32,6 +32,24 @@ const TabPanel = ({ children, value, index, ...other }) => (
   </div>
 );
 
+const NoAdsMessage = ({ message, showCreateButton, onCreateClick }) => (
+  <Box sx={{ textAlign: 'center', py: 4 }}>
+    <Typography variant="h6" color="text.secondary" gutterBottom>
+      {message}
+    </Typography>
+    {showCreateButton && (
+      <Button
+        variant="contained"
+        startIcon={<Add />}
+        onClick={onCreateClick}
+        sx={{ mt: 2 }}
+      >
+        Dodaj pierwsze ogłoszenie
+      </Button>
+    )}
+  </Box>
+);
+
 export const Profile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,28 +58,19 @@ export const Profile = () => {
   const { myAds } = useSelector(state => state.ads);
   
   const [activeTab, setActiveTab] = useState(0);
-  const [filters, setFilters] = useState({
-    page: 1,
-    limit: 12,
-    status: 'all'
-  });
 
   useEffect(() => {
     if (isAuth) {
-      dispatch(fetchMyAds(filters));
+      dispatch(fetchMyAds({ page: 1, limit: 12 }));
     }
-  }, [dispatch, isAuth, filters]);
+  }, [dispatch, isAuth]);
 
-  if (!isAuth) {
-    return <Navigate to="/login" />;
+  if (!isAuth || !currentUser) {
+    return <Navigate to="/login" replace />;
   }
 
   const handleTabChange = (_, newValue) => {
     setActiveTab(newValue);
-    const status = newValue === 0 ? 'all' : newValue === 1 ? 'active' : 'inactive';
-    const newFilters = { ...filters, status, page: 1 };
-    setFilters(newFilters);
-    dispatch(fetchMyAds(newFilters));
   };
 
   const navigateToAd = (adId) => {
@@ -70,6 +79,15 @@ export const Profile = () => {
 
   const navigateToCreateAd = () => {
     navigate('/create');
+  };
+
+  const getFilteredAds = () => {
+    const ads = myAds.items || [];
+    switch (activeTab) {
+      case 1: return ads.filter(ad => ad.active);
+      case 2: return ads.filter(ad => !ad.active);
+      default: return ads;
+    }
   };
 
   const getStats = () => {
@@ -82,45 +100,38 @@ export const Profile = () => {
   };
 
   const stats = getStats();
+  const filteredAds = getFilteredAds();
+
+  const getNoAdsMessage = () => {
+    switch (activeTab) {
+      case 1: return "Nie masz aktywnych ogłoszeń";
+      case 2: return "Nie masz nieaktywnych ogłoszeń";
+      default: return "Nie masz jeszcze żadnych ogłoszeń";
+    }
+  };
 
   const renderAds = () => {
     if (myAds.status === 'loading') {
-      return <LoadingState message="Ładowanie Twoich ogłoszeń..." />;
+      return <LoadingState />;
     }
 
     if (myAds.status === 'error') {
-      return <ErrorState message="Nie udało się załadować ogłoszeń" />;
+      return <ErrorState />;
     }
 
-    if (!myAds.items || myAds.items.length === 0) {
+    if (filteredAds.length === 0) {
       return (
-        <NoResultsState 
-          message={
-            activeTab === 0 
-              ? "Nie masz jeszcze żadnych ogłoszeń"
-              : activeTab === 1 
-                ? "Nie masz aktywnych ogłoszeń" 
-                : "Nie masz nieaktywnych ogłoszeń"
-          }
-          action={
-            activeTab === 0 && (
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={navigateToCreateAd}
-                sx={{ mt: 2 }}
-              >
-                Dodaj pierwsze ogłoszenie
-              </Button>
-            )
-          }
+        <NoAdsMessage
+          message={getNoAdsMessage()}
+          showCreateButton={activeTab === 0}
+          onCreateClick={navigateToCreateAd}
         />
       );
     }
 
     return (
       <Grid container spacing={2}>
-        {myAds.items.map(ad => (
+        {filteredAds.map(ad => (
           <Grid item xs={12} sm={6} md={4} key={ad._id}>
             <AdCard 
               ad={ad} 
@@ -145,10 +156,10 @@ export const Profile = () => {
           </Avatar>
           <Box>
             <Typography variant="h4" className={styles.userName}>
-              {currentUser?.fullName || 'Użytkownik'}
+              {currentUser.fullName || 'Użytkownik'}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {currentUser?.email}
+              {currentUser.email}
             </Typography>
             <Box className={styles.statsContainer}>
               <Chip 
